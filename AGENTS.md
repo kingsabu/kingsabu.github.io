@@ -5,7 +5,7 @@
   scripts and no outside fonts; every page keeps the light and dark colours of index.html and reads well on a phone.
 - Layout: index.html lists the apps; each app has its own folder named after its store name in romanization (hannun-gauge for 한눈계기판) with privacy.html and
   any other page that app needs; app-ads.txt stays at the root, one line per AdMob publisher ID in the form `google.com, pub-<id>, DIRECT, f08c47fec0942fa0`
-  (added once the operator's AdMob account exists); .nojekyll keeps GitHub Pages from rewriting files.
+  (pub-5849986125477905 since 2026-11-01, the AdMob account of hannun.buffalo@gmail.com); .nojekyll keeps GitHub Pages from rewriting files.
 - Hosting: GitHub Pages user site of the operator's GitHub account kingsabu, repository kingsabu.github.io, so the site lives at https://kingsabu.github.io and
   app-ads.txt at https://kingsabu.github.io/app-ads.txt (github.io is a public suffix, so that host is its own root domain). Publishing makes every file public:
   push only after the operator agreed to publish that change. A custom domain can point at the same site later without moving it. Published on 2026-11-01
