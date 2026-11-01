@@ -11,4 +11,5 @@
   push only after the operator agreed to publish that change. A custom domain can point at the same site later without moving it.
 - The privacy policy of each app lives only here; the app repositories link to its address (play_gauge docs/store-listing.md). When an app starts to collect
   something new or its ads SDK changes what it gathers, change its privacy.html with a new 시행일 in the same task.
+- Contact: hannun.buffalo@gmail.com, the operator's address for the 한눈 series (decided 2026-11-01; the Play Console and AdMob accounts use it too), on every page.
 - Hard wrap 170 columns, no comments, UTF-8 without BOM, LF line endings.
