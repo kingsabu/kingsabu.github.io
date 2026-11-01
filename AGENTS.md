@@ -8,7 +8,9 @@
   (added once the operator's AdMob account exists); .nojekyll keeps GitHub Pages from rewriting files.
 - Hosting: GitHub Pages user site of the operator's GitHub account kingsabu, repository kingsabu.github.io, so the site lives at https://kingsabu.github.io and
   app-ads.txt at https://kingsabu.github.io/app-ads.txt (github.io is a public suffix, so that host is its own root domain). Publishing makes every file public:
-  push only after the operator agreed to publish that change. A custom domain can point at the same site later without moving it.
+  push only after the operator agreed to publish that change. A custom domain can point at the same site later without moving it. Published on 2026-11-01
+  (gh repo create, public; Pages builds main at /). Commits here use the local author 한눈앱 <hannun.buffalo@gmail.com> (git config in this repository), so the
+  public history never shows the PC's personal Git name or email; the first commits were rewritten to it before the first push.
 - The privacy policy of each app lives only here; the app repositories link to its address (play_gauge docs/store-listing.md). When an app starts to collect
   something new or its ads SDK changes what it gathers, change its privacy.html with a new 시행일 in the same task.
 - Contact: hannun.buffalo@gmail.com, the operator's address for the 한눈 series (decided 2026-11-01; the Play Console and AdMob accounts use it too), on every page.
