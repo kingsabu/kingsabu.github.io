@@ -59,11 +59,6 @@ footer { color: var(--soft); font-size: 0.9em; margin-top: 28px; }
 <button id="again" type="button" class="line">다시 점검</button>
 </section>
 
-<section class="card">
-<h2>한 가지만 더 (선택)</h2>
-<p class="info">이 점검 페이지는 보안접속(https)만 쓸 수 있어서, 일반접속(http)은 아래 단추로 직접 열어 확인해 주세요. 새 창이 열리고 사이트가 보이면 "일반접속은 됨", 계속 빈 화면이면 "일반접속도 안 됨"입니다.</p>
-<button id="plain" type="button" class="line">일반접속(http)으로 열어 보기</button>
-</section>
 
 <footer>문의 : 씨에이치하모니 (주문 담당자)</footer>
 
@@ -73,6 +68,7 @@ var TESTS = [
   { key: 'N', name: '인터넷 연결 (대조용)', desc: '점검 자체가 제대로 도는지 보는 기준입니다', url: 'https://www.naver.com/favicon.ico' },
   { key: 'A', name: 'B2B 사이트 (chharmonyb2b.com)', desc: '평소 쓰시는 주문 사이트입니다', url: 'https://www.chharmonyb2b.com/img/title.ico' },
   { key: 'B', name: '보조 주소 (chharmonyb2b.co.kr)', desc: '같은 서버의 다른 주소입니다', url: 'https://www.chharmonyb2b.co.kr/img/title.ico' },
+  { key: 'H', name: '회사 홈페이지 (chharmony.com)', desc: '주문 사이트와 같은 서버에 있는 다른 주소입니다', url: 'https://www.chharmony.com/img/top_logo.png' },
   { key: 'C', name: '서버 주소로 직접', desc: '주소 이름 없이 서버로 바로 가 봅니다 (이 줄은 ⚠️ 가 정상입니다)', url: 'https://128.134.187.101/img/title.ico' }
 ];
 var MARK = { ok: '✅', reply: '⚠️', timeout: '⛔', wait: '⏳' };
@@ -103,7 +99,7 @@ function probe(url) {
 }
 
 function judge(s) {
-  var net = s.N.status, a = s.A.status, b = s.B.status, c = s.C.status;
+  var net = s.N.status, a = s.A.status, b = s.B.status, h = s.H.status, c = s.C.status;
   var blocked = function (x) { return x === 'timeout'; };
   if (blocked(net)) {
     return { tone: 'warn', title: '점검을 끝내지 못했습니다',
@@ -118,10 +114,11 @@ function judge(s) {
       advice: '같은 서버인데 chharmonyb2b.com 만 막히고 chharmonyb2b.co.kr 은 열립니다. 주소 이름 기준으로 막는 장비(사내 방화벽·보안 프로그램)가 있다는 뜻입니다. 당장은 ' +
         'https://www.chharmonyb2b.co.kr 로 주문하시고, 전산 담당자께 chharmonyb2b.com 허용을 요청해 주세요.' };
   }
-  if (blocked(a) && blocked(b) && !blocked(c)) {
+  if (blocked(a) && blocked(b) && (!blocked(h) || !blocked(c))) {
+    var same = !blocked(h) ? '같은 서버에 있는 회사 홈페이지(chharmony.com)는 열리는데 주문 사이트 주소만 막힙니다. ' : '서버로는 닿는데 주문 사이트 두 주소가 모두 막힙니다. ';
     return { tone: 'warn', title: '주소 이름 기준으로 막혀 있습니다',
-      advice: '서버로는 닿는데 두 주소 모두 막힙니다. 사내 방화벽이나 통신사의 주소 차단, 또는 DNS 설정 문제입니다. 이 화면을 전산 담당자께 보여 주시고 chharmonyb2b.com 과 ' +
-        'chharmonyb2b.co.kr 허용을 요청해 주세요.' };
+      advice: same + '사내 방화벽이나 통신사의 주소 차단, 또는 DNS 설정 문제입니다. 이 화면을 전산 담당자께 보여 주시고 chharmonyb2b.com 과 chharmonyb2b.co.kr 허용을 ' +
+        '요청해 주세요.' };
   }
   return { tone: 'bad', title: '저희 서버로 가는 길이 막혀 있습니다',
     advice: '주소와 상관없이 서버(128.134.187.101)까지 닿지 못합니다. 사내 방화벽이나 통신사 구간에서 막혔을 가능성이 큽니다. 이 화면을 캡처해 보내 주시고, 회사 인터넷 대신 ' +
@@ -152,7 +149,6 @@ function run() {
 }
 
 el('again').addEventListener('click', run);
-el('plain').addEventListener('click', function () { window.open('http://www.chharmonyb2b.com/', '_blank', 'noopener'); });
 el('copy').addEventListener('click', function () {
   var text = el('summary').textContent;
   if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(function () { el('copy').textContent = '복사했습니다'; }); }
