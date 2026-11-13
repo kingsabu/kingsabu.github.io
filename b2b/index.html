@@ -64,12 +64,10 @@ footer { color: var(--soft); font-size: 0.9em; margin-top: 28px; }
 
 <section class="card">
 <h2>담당자에게 알리기</h2>
-<p class="info">아래 한 줄이면 저희가 원인을 바로 알 수 있습니다. 복사해서 보내시거나 메일 단추를 눌러 주세요.</p>
+<p class="info">아래 한 줄이면 저희가 원인을 바로 알 수 있습니다. 복사해서 담당자에게 보내 주시거나, 이 화면을 캡처해 보내 주세요.</p>
 <p id="summary" class="code">준비 중…</p>
 <div class="btns">
 <button id="copy" type="button">결과 복사</button>
-<a class="btn line" id="mail" href="mailto:chweb01@chharmony.co.kr">메일로 보내기</a>
-<a class="btn line" href="tel:07086701900">전화 걸기 (070-8670-1900)</a>
 </div>
 </section>
 
@@ -217,8 +215,6 @@ function run() {
     var code = TESTS.map(function (t) { return t.key + ':' + state[t.key].status; }).join(' ');
     var line = 'B2B점검 ' + stamp() + ' | ' + code + ' | IP ' + (window.__ip || '확인 못 함');
     el('summary').textContent = line;
-    el('mail').href = 'mailto:chweb01@chharmony.co.kr?subject=' + encodeURIComponent('[B2B 접속 점검] 결과') +
-      '&body=' + encodeURIComponent(line + NL + NL + '회사명 : ' + NL + '담당자 : ' + NL + '연락처 : ' + NL);
   });
 }
 
