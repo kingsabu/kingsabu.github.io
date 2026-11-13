@@ -18,8 +18,12 @@
   page, the Play Store app switched off, a different account in the Play Store) and a short English part. When the app reaches production, replace it with
   the plain Play link.
 - b2b/index.html (operator, 2026-11-13): a connection check for customers of the operator's other business who cannot open chharmonyb2b.com. It loads a small
-  image from that site, from its .co.kr name and from its server address, then says in plain Korean where the block is and gives one line to copy to the
-  operator. It is the only page here with a script, because the check has to run in the customer's own browser; github.io serves https only, so the plain
-  http check is a button that opens a new tab instead of an image.
+  image from five places (a control site, chharmonyb2b.com, its .co.kr name, chharmony.com on the same server, and the server address itself) and reads a
+  load, a fast error and a ten second silence as reachable, reachable but wrong, and blocked, which tells the customer in plain Korean whether the block is on
+  the address, on the server or nowhere. It then offers what a page can actually do: open either address, clear its own stored data and check again, copy the
+  one line result, mail or ring the operator, download a small b2b_check.cmd that runs ipconfig, nslookup, ping and tracert and leaves the result on the
+  clipboard, and copy the commands or the flushdns line for the ones that need a console. It is the only page here with a script, because the check has to run
+  in the customer's own browser. github.io serves https only, so a plain http check is impossible here and is left out; the server-address check already
+  separates an address block from a route block.
 - Contact: hannun.buffalo@gmail.com, the operator's address for the 한눈 series (decided 2026-11-01; the Play Console and AdMob accounts use it too), on every page.
 - Hard wrap 170 columns, no comments, UTF-8 without BOM, LF line endings.
