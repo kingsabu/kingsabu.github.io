@@ -17,5 +17,9 @@
   with the fixes for what blocked real testers (Google sign-in refused inside KakaoTalk and other in-app browsers, only 「Install on more devices」 on the web
   page, the Play Store app switched off, a different account in the Play Store) and a short English part. When the app reaches production, replace it with
   the plain Play link.
+- b2b/index.html (operator, 2026-11-13): a connection check for customers of the operator's other business who cannot open chharmonyb2b.com. It loads a small
+  image from that site, from its .co.kr name and from its server address, then says in plain Korean where the block is and gives one line to copy to the
+  operator. It is the only page here with a script, because the check has to run in the customer's own browser; github.io serves https only, so the plain
+  http check is a button that opens a new tab instead of an image.
 - Contact: hannun.buffalo@gmail.com, the operator's address for the 한눈 series (decided 2026-11-01; the Play Console and AdMob accounts use it too), on every page.
 - Hard wrap 170 columns, no comments, UTF-8 without BOM, LF line endings.

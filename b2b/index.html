@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B2B 접속 점검</title>
+<meta name="description" content="씨에이치하모니 B2B 주문 사이트에 접속이 안 될 때 어디서 막히는지 알아보는 점검 페이지">
+<style>
+:root { --page: #f2f4f7; --card: #ffffff; --line: #e1e4ea; --text: #1b1c1f; --soft: #5a5f69; --accent: #0b57d0;
+    --ok: #137333; --warn: #b45309; --bad: #b91c1c; --box: #f6f7f9; }
+@media (prefers-color-scheme: dark) { :root { --page: #111315; --card: #1c1f23; --line: #2c3036; --text: #e6e8eb; --soft: #a3a9b3;
+    --accent: #8ab4f8; --ok: #6dd58c; --warn: #f0b429; --bad: #ff8a8a; --box: #23272c; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; line-height: 1.7; }
+main { max-width: 720px; margin: 0 auto; padding: 32px 16px 56px; }
+h1 { font-size: 1.8em; margin: 0 0 4px; }
+.lead { color: var(--soft); margin: 0 0 24px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+.card h2 { font-size: 1.15em; margin: 0 0 12px; }
+.row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.row:first-of-type { border-top: 0; }
+.mark { flex: 0 0 28px; font-size: 1.2em; text-align: center; }
+.what { flex: 1 1 auto; min-width: 0; }
+.what b { display: block; font-weight: 600; }
+.what span { color: var(--soft); font-size: 0.92em; }
+.time { flex: 0 0 auto; color: var(--soft); font-size: 0.9em; white-space: nowrap; }
+.verdict { font-size: 1.1em; font-weight: 600; margin: 0 0 8px; }
+.verdict.ok { color: var(--ok); } .verdict.warn { color: var(--warn); } .verdict.bad { color: var(--bad); }
+.code { background: var(--box); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; word-break: break-all;
+    font-family: ui-monospace, Consolas, monospace; font-size: 0.95em; }
+.info { color: var(--soft); font-size: 0.95em; margin: 0; }
+button { font: inherit; font-weight: 600; color: #ffffff; background: var(--accent); border: 0; border-radius: 10px;
+    padding: 10px 18px; cursor: pointer; margin: 4px 8px 4px 0; }
+button.line { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+footer { color: var(--soft); font-size: 0.9em; margin-top: 28px; }
+</style>
+</head>
+<body>
+<main>
+<h1>B2B 접속 점검</h1>
+<p class="lead">씨에이치하모니 B2B 주문 사이트(chharmonyb2b.com)가 열리지 않을 때, 어느 구간에서 막히는지 알아봅니다. 아무것도 누르지 않아도 자동으로 진행되며 15초쯤 걸립니다.</p>
+
+<section class="card">
+<h2>점검 결과</h2>
+<div id="rows"></div>
+</section>
+
+<section class="card">
+<h2>판정</h2>
+<p id="verdict" class="verdict">점검하고 있습니다…</p>
+<p id="advice" class="info"></p>
+</section>
+
+<section class="card">
+<h2>이 화면을 보내 주세요</h2>
+<p class="info">아래 한 줄을 복사해서 담당자에게 보내 주시거나, 이 화면을 그대로 캡처해 보내 주시면 됩니다.</p>
+<p id="summary" class="code">준비 중…</p>
+<button id="copy" type="button">결과 복사</button>
+<button id="again" type="button" class="line">다시 점검</button>
+</section>
+
+<section class="card">
+<h2>한 가지만 더 (선택)</h2>
+<p class="info">이 점검 페이지는 보안접속(https)만 쓸 수 있어서, 일반접속(http)은 아래 단추로 직접 열어 확인해 주세요. 새 창이 열리고 사이트가 보이면 "일반접속은 됨", 계속 빈 화면이면 "일반접속도 안 됨"입니다.</p>
+<button id="plain" type="button" class="line">일반접속(http)으로 열어 보기</button>
+</section>
+
+<footer>문의 : 씨에이치하모니 (주문 담당자)</footer>
+
+<script>
+var TIMEOUT = 10000;
+var TESTS = [
+  { key: 'N', name: '인터넷 연결 (대조용)', desc: '점검 자체가 제대로 도는지 보는 기준입니다', url: 'https://www.naver.com/favicon.ico' },
+  { key: 'A', name: 'B2B 사이트 (chharmonyb2b.com)', desc: '평소 쓰시는 주문 사이트입니다', url: 'https://www.chharmonyb2b.com/img/title.ico' },
+  { key: 'B', name: '보조 주소 (chharmonyb2b.co.kr)', desc: '같은 서버의 다른 주소입니다', url: 'https://www.chharmonyb2b.co.kr/img/title.ico' },
+  { key: 'C', name: '서버 주소로 직접', desc: '주소 이름 없이 서버로 바로 가 봅니다 (이 줄은 ⚠️ 가 정상입니다)', url: 'https://128.134.187.101/img/title.ico' }
+];
+var MARK = { ok: '✅', reply: '⚠️', timeout: '⛔', wait: '⏳' };
+var LABEL = { ok: '정상', reply: '응답은 오지만 오류', timeout: '응답 없음', wait: '확인 중…' };
+
+function el(id) { return document.getElementById(id); }
+
+function draw(state) {
+  var html = '';
+  for (var i = 0; i < TESTS.length; i++) {
+    var t = TESTS[i], s = state[t.key] || { status: 'wait' };
+    var time = s.ms ? (Math.round(s.ms / 100) / 10) + '초' : (s.status === 'timeout' ? '10초 초과' : '');
+    html += '<div class="row"><div class="mark">' + MARK[s.status] + '</div><div class="what"><b>' + t.name + '</b><span>' + LABEL[s.status] + ' — ' + t.desc +
+      '</span></div><div class="time">' + time + '</div></div>';
+  }
+  el('rows').innerHTML = html;
+}
+
+function probe(url) {
+  return new Promise(function (resolve) {
+    var img = new Image(), t0 = Date.now(), done = false;
+    var finish = function (status) { if (done) { return; } done = true; clearTimeout(timer); resolve({ status: status, ms: Date.now() - t0 }); };
+    var timer = setTimeout(function () { finish('timeout'); }, TIMEOUT);
+    img.onload = function () { finish('ok'); };
+    img.onerror = function () { finish('reply'); };
+    img.src = url + (url.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now();
+  });
+}
+
+function judge(s) {
+  var net = s.N.status, a = s.A.status, b = s.B.status, c = s.C.status;
+  var blocked = function (x) { return x === 'timeout'; };
+  if (blocked(net)) {
+    return { tone: 'warn', title: '점검을 끝내지 못했습니다',
+      advice: '이 점검 페이지에서 바깥으로 나가는 연결이 모두 막혀 있습니다. 다른 인터넷(휴대폰 테더링 등)에서 다시 열어 주세요.' };
+  }
+  if (!blocked(a) && !blocked(b)) {
+    return { tone: 'ok', title: '지금은 접속이 됩니다',
+      advice: '저희 서버까지 정상으로 닿았습니다. 그래도 사이트가 안 열리면 브라우저 캐시를 지우거나 다른 브라우저로 열어 보시고, 그래도 같으면 이 결과를 보내 주세요.' };
+  }
+  if (blocked(a) && !blocked(b)) {
+    return { tone: 'warn', title: '.com 주소만 막혀 있습니다',
+      advice: '같은 서버인데 chharmonyb2b.com 만 막히고 chharmonyb2b.co.kr 은 열립니다. 주소 이름 기준으로 막는 장비(사내 방화벽·보안 프로그램)가 있다는 뜻입니다. 당장은 ' +
+        'https://www.chharmonyb2b.co.kr 로 주문하시고, 전산 담당자께 chharmonyb2b.com 허용을 요청해 주세요.' };
+  }
+  if (blocked(a) && blocked(b) && !blocked(c)) {
+    return { tone: 'warn', title: '주소 이름 기준으로 막혀 있습니다',
+      advice: '서버로는 닿는데 두 주소 모두 막힙니다. 사내 방화벽이나 통신사의 주소 차단, 또는 DNS 설정 문제입니다. 이 화면을 전산 담당자께 보여 주시고 chharmonyb2b.com 과 ' +
+        'chharmonyb2b.co.kr 허용을 요청해 주세요.' };
+  }
+  return { tone: 'bad', title: '저희 서버로 가는 길이 막혀 있습니다',
+    advice: '주소와 상관없이 서버(128.134.187.101)까지 닿지 못합니다. 사내 방화벽이나 통신사 구간에서 막혔을 가능성이 큽니다. 이 화면을 캡처해 보내 주시고, 회사 인터넷 대신 ' +
+      '휴대폰 테더링으로도 한 번 열어 봐 주세요.' };
+}
+
+function stamp() {
+  var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function run() {
+  var state = {};
+  el('verdict').textContent = '점검하고 있습니다…';
+  el('verdict').className = 'verdict';
+  el('advice').textContent = '';
+  el('summary').textContent = '준비 중…';
+  draw(state);
+  var jobs = TESTS.map(function (t) { return probe(t.url).then(function (r) { state[t.key] = r; draw(state); return r; }); });
+  Promise.all(jobs).then(function () {
+    var v = judge(state);
+    el('verdict').textContent = v.title;
+    el('verdict').className = 'verdict ' + v.tone;
+    el('advice').textContent = v.advice;
+    var code = TESTS.map(function (t) { return t.key + ':' + state[t.key].status; }).join(' ');
+    el('summary').textContent = 'B2B점검 ' + stamp() + ' | ' + code + ' | IP ' + (window.__ip || '확인 못 함') + ' | ' + navigator.userAgent;
+  });
+}
+
+el('again').addEventListener('click', run);
+el('plain').addEventListener('click', function () { window.open('http://www.chharmonyb2b.com/', '_blank', 'noopener'); });
+el('copy').addEventListener('click', function () {
+  var text = el('summary').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(function () { el('copy').textContent = '복사했습니다'; }); }
+  else { el('copy').textContent = '길게 눌러 복사해 주세요'; }
+});
+
+fetch('https://api.ipify.org?format=json').then(function (r) { return r.json(); }).then(function (j) {
+  window.__ip = j.ip;
+  var t = el('summary').textContent;
+  if (t.indexOf('확인 못 함') > 0) { el('summary').textContent = t.replace('확인 못 함', j.ip); }
+}).catch(function () { });
+
+run();
+</script>
+</main>
+</body>
+</html>
